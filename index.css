@@ -1,0 +1,30 @@
+#mocha {
+  margin: 10px;
+}
+
+#mocha .test h2 {
+  font-size: 12pt;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  margin: 0 auto;
+}
+
+.col {
+  height: 100vh;
+  overflow: scroll;
+  padding: 10px;
+}
+
+.left {
+  width: 35%;
+  max-width: 400px;
+  min-width: 300px;
+}
+
+.right {
+  width: 65%;
+  max-width: 600px;
+}

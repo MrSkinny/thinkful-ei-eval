@@ -1,0 +1,29 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link href="vendor/mocha.css" rel="stylesheet" />
+  <link href="index.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="row">
+    <div class="col left">
+      <section class="directions">
+
+      </section>
+    </div>
+    <div class="col right">
+      <div id="mocha"></div>
+    </div>
+  </div>
+
+  <script src="vendor/jquery.min.js"></script>
+  <script src="vendor/expect.js"></script>
+  <script src="vendor/mocha.js"></script>
+
+  <script>mocha.setup('bdd')</script>
+  <script src="scripts/index.js"></script>
+  <script src="student.js"></script>
+
+</body>
+</html>
