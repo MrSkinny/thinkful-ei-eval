@@ -1,13 +1,14 @@
 const state = {
   validToken: null,
   error: null,
+  tests: [],
 };
 
 const Templates = {
   instructions() {
     return `
       <h2>Instructions</h2>
-      <p>In the <code>student.js</code> file, complete the functions as described below. If you write them correctly, the tests on the right hand side should pass (you will only see green check marks for each test).</p>
+      <p>In the <code>student.js</code> file, complete the functions as described below. If you write them correctly, the tests on the right hand side will pass (i.e. you will see only green check marks against each test).</p>
 
       <ul>
         <li>You can refresh this page whenever you make changes to see if your tests pass</li>
@@ -18,22 +19,7 @@ const Templates = {
 
       <button id="reset-password">Reset Passphrase</button>
 
-      <hr />
-
-      <h4>kmToMiles</h4>
-      <p>
-        Define a function named <code>kmToMiles</code> that receives one parameter:
-      </p>
-      <ol>
-        <li>km - <em>type: number</em></li>
-      </ol>
-      <p>
-        The function should return a number in miles, <strong>rounded down</strong> to the nearest integer. 
-      </p>
-      <p>
-        <em>HINT</em>: There are 1.6km in 1 mile.<br />
-        <em>HINT</em>: What method on Javascript's <code>Math</code> object can round decimals down to the nearest whole number?
-      </p>
+      ${state.tests.map(test => `<hr />${test.instr}`).join('')}
     `;  
   },
 
@@ -68,6 +54,8 @@ const runMocha = function() {
 const render = function() {
   if (state.validToken) {
     $('.directions').html(Templates.instructions());
+    eval(state.tests[0].script);
+    runMocha();
   } else {
     $('.directions').html(Templates.passPrompt());
   }
@@ -83,10 +71,7 @@ const fetchTests = function(token) {
   const url = new URL('http://localhost:8080/api/tests');
   url.searchParams.set('token', token);
 
-  return $.ajax({
-    method: 'GET',
-    url,
-  });
+  return $.getJSON(url);
 }
 
 const main = function() {
@@ -94,8 +79,7 @@ const main = function() {
     state.validToken = localStorage.getItem('thinkful-eval-token');
     fetchTests(state.validToken)
       .then(tests => {
-        eval(tests);
-        runMocha();
+        state.tests = tests;
         render();
       })
   }
@@ -110,8 +94,7 @@ const main = function() {
       .then(tests => {
         localStorage.setItem('thinkful-eval-token', token);
         state.validToken = token;
-        eval(tests);
-        runMocha();
+        state.tests = tests;
         render();
       })
 
