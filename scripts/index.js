@@ -1,3 +1,5 @@
+/* global mocha */
+
 const state = {
   validToken: null,
   error: null,
@@ -45,11 +47,11 @@ const runMocha = function() {
 
     // Remove ugly stack traces and keep only first line of error
     $.each($('.error'), (ind, el) => {
-      const firstLine = $(el).text().split('\n')[0]
+      const firstLine = $(el).text().split('\n')[0];
       $(el).text(firstLine);
     });
   });
-}
+};
 
 const render = function() {
   if (state.validToken) {
@@ -65,23 +67,31 @@ const render = function() {
   } else {
     $('.error').remove();
   }
-}
+};
 
 const fetchTests = function(token) {
   const url = new URL('http://localhost:8080/api/tests');
   url.searchParams.set('token', token);
 
   return $.getJSON(url);
-}
+};
+
+const setTestsAndRender = function(tests) {
+  state.tests = tests;
+  render();
+};
+
+const setToken = function(token) {
+  localStorage.setItem('thinkful-eval-token', token);
+  state.validToken = token;
+};
 
 const main = function() {
   if (localStorage.getItem('thinkful-eval-token')) {
     state.validToken = localStorage.getItem('thinkful-eval-token');
     fetchTests(state.validToken)
-      .then(tests => {
-        state.tests = tests;
-        render();
-      })
+      .then(tests => setTestsAndRender(tests))
+      .catch(err => console.log(err));
   }
 
   render();
@@ -92,12 +102,9 @@ const main = function() {
 
     fetchTests(token)
       .then(tests => {
-        localStorage.setItem('thinkful-eval-token', token);
-        state.validToken = token;
-        state.tests = tests;
-        render();
+        setToken(token);
+        setTestsAndRender(tests);
       })
-
       .catch(err => {
         if (err.status === 401) {
           state.error = 'Incorrect passphrase';
@@ -106,7 +113,7 @@ const main = function() {
       });
   });
 
-  $('.directions').on('click', '#reset-password', e => {
+  $('.directions').on('click', '#reset-password', () => {
     localStorage.removeItem('thinkful-eval-token');
     state.validToken = null;
     render();
