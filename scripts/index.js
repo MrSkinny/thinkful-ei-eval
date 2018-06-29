@@ -84,7 +84,7 @@ const fetchTests = function(token) {
 
 const setTestsAndRender = function(tests) {
   state.tests = tests;
-  render();
+  setTimeout(() => render(), 50);
 };
 
 const setToken = function(token) {
