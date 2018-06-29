@@ -1,5 +1,9 @@
 /* global mocha */
 
+const currentUrl = new URL(window.location.href);
+const SERVER_PROD_URL = 'TODO: production_url';
+const BASE_URL = currentUrl.searchParams.get('debug') === '1' ? 'http://localhost:8080' : SERVER_PROD_URL;
+
 const state = {
   validToken: null,
   error: null,
@@ -56,10 +60,11 @@ const runMocha = function() {
 const render = function() {
   if (state.validToken) {
     $('.directions').html(Templates.instructions());
-    eval(state.tests[0].script);
+    state.tests.forEach(test => eval(test.script));
     runMocha();
   } else {
     $('.directions').html(Templates.passPrompt());
+    $('#mocha').empty();
   }
 
   if (state.error) {
@@ -70,7 +75,7 @@ const render = function() {
 };
 
 const fetchTests = function(token) {
-  const url = new URL('http://localhost:8080/api/tests');
+  const url = new URL(`${BASE_URL}/api/tests`);
   url.searchParams.set('token', token);
 
   return $.getJSON(url);
@@ -86,17 +91,8 @@ const setToken = function(token) {
   state.validToken = token;
 };
 
-const main = function() {
-  if (localStorage.getItem('thinkful-eval-token')) {
-    state.validToken = localStorage.getItem('thinkful-eval-token');
-    fetchTests(state.validToken)
-      .then(tests => setTestsAndRender(tests))
-      .catch(err => console.log(err));
-  }
-
-  render();
-
-  $('.directions').on('submit', '#password-form', e => {
+const Listeners = {
+  onSubmitPasswordForm(e) {
     e.preventDefault();
     const token = $('#password-form-password').val();
 
@@ -109,15 +105,40 @@ const main = function() {
         if (err.status === 401) {
           state.error = 'Incorrect passphrase';
           render();
+        } else if (err.status >= 500) {
+          state.error = 'Internal Server Error';
+          render();
+        } else {
+          state.error = 'Unknown error';
+          render();
+          console.log(err);
         }
       });
-  });
+  },
 
-  $('.directions').on('click', '#reset-password', () => {
+  onClickResetPassword() {
     localStorage.removeItem('thinkful-eval-token');
     state.validToken = null;
     render();
-  });
+  }
+};
+
+const detectToken = function() {
+  if (localStorage.getItem('thinkful-eval-token')) {
+    state.validToken = localStorage.getItem('thinkful-eval-token');
+    return fetchTests(state.validToken)
+      .then(tests => setTestsAndRender(tests))
+      .catch(err => console.log(err));
+  } else {
+    render();
+  }
+};
+
+const main = function() {
+  $('.directions').on('submit', '#password-form', e => Listeners.onSubmitPasswordForm(e));
+  $('.directions').on('click', '#reset-password', Listeners.onClickResetPassword);
+
+  detectToken();
 };
 
 $(main);
