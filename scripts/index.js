@@ -1,7 +1,7 @@
 /* global mocha */
 
 const currentUrl = new URL(window.location.href);
-const SERVER_PROD_URL = 'TODO: production_url';
+const SERVER_PROD_URL = 'https://thinkful-ei-eval-server.herokuapp.com';
 const BASE_URL = currentUrl.searchParams.get('debug') === '1' ? 'http://localhost:8080' : SERVER_PROD_URL;
 
 const state = {
@@ -13,6 +13,7 @@ const state = {
 const Templates = {
   instructions() {
     return `
+      <p class="error"></p>
       <h2>Instructions</h2>
       <p>In the <code>student.js</code> file, complete the functions as described below. If you write them correctly, the tests on the right hand side will pass (i.e. you will see only green check marks against each test).</p>
 
@@ -98,6 +99,7 @@ const Listeners = {
 
     fetchTests(token)
       .then(tests => {
+        state.error = null;
         setToken(token);
         setTestsAndRender(tests);
       })
@@ -128,7 +130,11 @@ const detectToken = function() {
     state.validToken = localStorage.getItem('thinkful-eval-token');
     return fetchTests(state.validToken)
       .then(tests => setTestsAndRender(tests))
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+        state.error = 'Server error';
+        render();
+      });
   } else {
     render();
   }

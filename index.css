@@ -31,3 +31,7 @@ body {
 .right {
   width: 65%;
 }
+
+.error {
+  color: red;
+}
