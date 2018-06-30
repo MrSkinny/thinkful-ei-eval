@@ -8,6 +8,7 @@ const state = {
   validToken: null,
   error: null,
   tests: [],
+  changedToken: false,
 };
 
 const Templates = {
@@ -59,6 +60,11 @@ const runMocha = function() {
 };
 
 const render = function() {
+  if (state.changedToken) {
+    // Reload page to clear tests cache
+    return window.location = window.location.href;
+  }
+
   if (state.validToken) {
     $('.directions').html(Templates.instructions());
     state.tests.forEach(test => eval(test.script));
@@ -84,12 +90,13 @@ const fetchTests = function(token) {
 
 const setTestsAndRender = function(tests) {
   state.tests = tests;
-  setTimeout(() => render(), 50);
+  render();
 };
 
 const setToken = function(token) {
   localStorage.setItem('thinkful-eval-token', token);
   state.validToken = token;
+  state.changedToken = true;
 };
 
 const Listeners = {
