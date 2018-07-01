@@ -6,6 +6,7 @@ const BASE_URL = currentUrl.searchParams.get('debug') === '1' ? 'http://localhos
 
 const state = {
   validToken: null,
+  tokenSubmitting: false,
   error: null,
   tests: [],
   changedToken: false,
@@ -39,8 +40,9 @@ const Templates = {
       </p>
       <form id="password-form">
         <input id="password-form-password" name="password" type="text" />
-        <input type="submit" />
+        <input type="submit" ${state.tokenSubmitting ? 'disabled' : ''} />
       </form>
+      <p class="form-status">${ state.tokenSubmitting ? 'Contacting server...' : '' }</p>
       <p class="error"></p>
     `;
   }
@@ -103,14 +105,18 @@ const Listeners = {
   onSubmitPasswordForm(e) {
     e.preventDefault();
     const token = $('#password-form-password').val();
+    state.tokenSubmitting = true;
+    state.error = null;
+    render();
 
     fetchTests(token)
       .then(tests => {
-        state.error = null;
+        state.tokenSubmitting = false;
         setToken(token);
         setTestsAndRender(tests);
       })
       .catch(err => {
+        state.tokenSubmitting = false;
         if (err.status === 401) {
           state.error = 'Incorrect passphrase';
           render();
