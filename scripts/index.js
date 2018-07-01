@@ -10,6 +10,8 @@ const state = {
   error: null,
   tests: [],
   changedToken: false,
+  submitCodeModal: false,
+  submitResponse: null,
 };
 
 const Templates = {
@@ -27,6 +29,7 @@ const Templates = {
       </ul>
 
       <button id="reset-password">Reset Passphrase</button>
+      <button id="open-submit-code">Submit Code</button>
 
       ${state.tests.map(test => `<hr />${test.instr}`).join('')}
     `;  
@@ -44,6 +47,28 @@ const Templates = {
       </form>
       <p class="form-status">${ state.tokenSubmitting ? 'Contacting server...' : '' }</p>
       <p class="error"></p>
+    `;
+  },
+
+  submitCodeModal() {
+    return `
+      <div class="modal-content">
+        <h3>Submit Your Evaluation</h3>
+        <form id="submit-code-form">
+          <div class="input-group">
+            <label for="submit-code-email">Your Email:</label>
+            <input type="email" name="email" id="submit-code-email" />
+          </div>
+          <div class="input-group">
+            <label for="submit-code-script">Code from student.js:</label>
+            <textarea name="code" id="submit-code-script" cols="50" rows="10" ></textarea>
+          </div>
+          <div class="button-group">
+            <button class="submit" type="submit">Submit</button>
+            <button class="cancel" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
     `;
   }
 };
@@ -65,6 +90,10 @@ const render = function() {
   if (state.changedToken) {
     // Reload page to clear tests cache
     return window.location = window.location.href;
+  }
+
+  if (state.submitCodeModal) {
+    return $('#modal').html(Templates.submitCodeModal());
   }
 
   if (state.validToken) {
@@ -90,6 +119,24 @@ const fetchTests = function(token) {
   return $.getJSON(url);
 };
 
+const formToJson = formData => {
+  const jsonObj = {};
+  for (const [key, val] of formData.entries()) jsonObj[key] = val;
+  return JSON.stringify(jsonObj);
+};
+
+const submitTests = function(token, data) {
+  const url = new URL(`${BASE_URL}/api/tests/submission`);
+  url.searchParams.set('token', token);
+
+  return $.ajax({
+    url,
+    method: 'POST',
+    contentType: 'application/json',
+    data,
+  });
+};
+
 const setTestsAndRender = function(tests) {
   state.tests = tests;
   render();
@@ -102,6 +149,25 @@ const setToken = function(token) {
 };
 
 const Listeners = {
+  onClickOpenModal() {
+    state.submitCodeModal = true;
+    render();
+  },
+
+  onClickCancelModal() {
+    window.location = window.location.href;
+  },
+
+  onSubmitTests(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = formToJson(formData);
+
+    submitTests(state.validToken, data)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+  },
+
   onSubmitPasswordForm(e) {
     e.preventDefault();
     const token = $('#password-form-password').val();
@@ -156,6 +222,9 @@ const detectToken = function() {
 const main = function() {
   $('.directions').on('submit', '#password-form', e => Listeners.onSubmitPasswordForm(e));
   $('.directions').on('click', '#reset-password', Listeners.onClickResetPassword);
+  $('.directions').on('click', '#open-submit-code', Listeners.onClickOpenModal);
+  $('#modal').on('click', '.cancel', Listeners.onClickCancelModal);
+  $('#modal').on('submit', '#submit-code-form', e => Listeners.onSubmitTests(e));
 
   detectToken();
 };
