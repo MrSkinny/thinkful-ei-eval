@@ -11,7 +11,7 @@ const state = {
   tests: [],
   changedToken: false,
   submitCodeModal: false,
-  submitResponse: null,
+  submitResponse: {},
 };
 
 const Templates = {
@@ -66,6 +66,9 @@ const Templates = {
           <div class="button-group">
             <button class="submit" type="submit">Submit</button>
             <button class="cancel" type="button">Cancel</button>
+          </div>
+          <div class="submit-response ${state.submitResponse.status !== 201 ? 'error' : ''}">
+            ${state.submitResponse.status === 201 ? 'Submission successful. Thank you!' : state.submitResponse.message || '' }
           </div>
         </form>
       </div>
@@ -133,6 +136,7 @@ const submitTests = function(token, data) {
     url,
     method: 'POST',
     contentType: 'application/json',
+    dataType: 'json',
     data,
   });
 };
@@ -164,8 +168,17 @@ const Listeners = {
     const data = formToJson(formData);
 
     submitTests(state.validToken, data)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+      .then((res) => {
+        state.submitResponse.status = 201;
+        render();
+      })
+      .catch(err => {
+        console.log('fail!');
+        console.log(err);
+        state.submitResponse.status = err.status;
+        state.submitResponse.message = err.responseJSON.message;
+        render();
+      });
   },
 
   onSubmitPasswordForm(e) {

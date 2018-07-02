@@ -94,3 +94,15 @@ body {
 .modal-content button.cancel {
   background-color: red;
 }
+
+.modal-content .submit-response {
+  text-align: center;
+  margin-top: 13px;
+  font-size: 16pt;
+  color: blue;
+  font-weight: bolder;
+}
+
+.modal-content .submit-response.error {
+  color: red;
+}
