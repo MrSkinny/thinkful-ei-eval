@@ -57,11 +57,11 @@ const Templates = {
         <form id="submit-code-form">
           <div class="input-group">
             <label for="submit-code-email">Your Email:</label>
-            <input type="email" name="email" id="submit-code-email" />
+            <input type="email" name="email" id="submit-code-email" required />
           </div>
           <div class="input-group">
             <label for="submit-code-script">Code from student.js:</label>
-            <textarea name="code" id="submit-code-script" cols="50" rows="10" ></textarea>
+            <textarea name="code" id="submit-code-script" cols="50" rows="10" required></textarea>
           </div>
           <div class="button-group">
             <button class="submit" type="submit">Submit</button>
