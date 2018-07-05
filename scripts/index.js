@@ -19,7 +19,7 @@ const Templates = {
     return `
       <p class="error"></p>
       <h2>Instructions</h2>
-      <p>In the <code>student.js</code> file, complete the functions as described below. If you write them correctly, the tests on the right hand side will pass (i.e. you will see only green check marks against each test).</p>
+      <p>In the <code>student.js</code> file, complete the functions as described below. If you write them correctly, the tests on the right hand side will pass (i.e. you will see only green check marks against each test). When the test is complete, use the Submit Code button below.</p>
 
       <ul>
         <li>You can refresh this page whenever you make changes to see if your tests pass</li>

@@ -106,3 +106,26 @@ body {
 .modal-content .submit-response.error {
   color: red;
 }
+
+.directions li {
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+.directions button {
+  font-size: 10pt;
+  border-radius: 15%;
+  border: 1px solid blue;
+  margin: 4px;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#reset-password {
+  background-color: red;
+}
+
+#open-submit-code {
+  background-color: darkgreen;
+}
