@@ -2,7 +2,7 @@
 
 This repo is a tool for conducting the Engineering Immersion evaluation interview.
 
-### Instructions for Students
+### Instructions for 
 
 * Clone this repo to your local machine
 * Open `index.html` in your web browser, running from your local filesystem
