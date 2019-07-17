@@ -28,8 +28,8 @@ const Templates = {
         <li>Talk through your thought process so your evaluator can understand how you're solving the problem.</li>
       </ul>
 
-      <button id="reset-password">Reset Passphrase</button>
-      <button id="open-submit-code">Submit Code</button>
+      <button id="reset-password" class="btn">Reset Passphrase</button>
+      <button id="open-submit-code" class="btn btn-primary">Submit Code</button>
 
       ${state.tests.map(test => `<hr />${test.instr}`).join('')}
     `;  
