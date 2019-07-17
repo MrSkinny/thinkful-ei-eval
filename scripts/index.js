@@ -223,16 +223,19 @@ const main = function() {
   const $directions = $('.directions');
   const $modal = $('#modal');
 
+  dialog.on('show', function (el, ev) {
+    state.submitCodeModal = true;
+  });
+
+  dialog.on('hide', function (el, ev) {
+    state.submitCodeModal = false;
+  });
+
   $directions.on('submit', '#password-form', Listeners.onSubmitPasswordForm);
   $directions.on('click', '#reset-password', Listeners.onClickResetPassword);
-  $directions.on('click', '#open-submit-code', () => {
-    state.submitCodeModal = true;
-    dialog.show();
-  });
-  $modal.on('click', '.cancel', () => {
-    state.submitCodeModal = false;
-    dialog.hide();
-  });
+  $directions.on('click', '#open-submit-code', dialog.show.bind(dialog));
+
+  $modal.on('click', '.cancel', dialog.hide.bind(dialog));
   $modal.on('submit', '#submit-code-form', Listeners.onSubmitTests);
 
   detectToken();
