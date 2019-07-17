@@ -220,17 +220,20 @@ const main = function() {
   const content = document.getElementById('main');
   const dialog = new A11yDialog(el, main);
 
-  $('.directions').on('submit', '#password-form', e => Listeners.onSubmitPasswordForm(e));
-  $('.directions').on('click', '#reset-password', Listeners.onClickResetPassword);
-  $('.directions').on('click', '#open-submit-code', () => {
+  const $directions = $('.directions');
+  const $modal = $('#modal');
+
+  $directions.on('submit', '#password-form', Listeners.onSubmitPasswordForm);
+  $directions.on('click', '#reset-password', Listeners.onClickResetPassword);
+  $directions.on('click', '#open-submit-code', () => {
     state.submitCodeModal = true;
     dialog.show();
   });
-  $('#modal').on('click', '.cancel', () => {
+  $modal.on('click', '.cancel', () => {
     state.submitCodeModal = false;
     dialog.hide();
   });
-  $('#modal').on('submit', '#submit-code-form', e => Listeners.onSubmitTests(e));
+  $modal.on('submit', '#submit-code-form', Listeners.onSubmitTests);
 
   detectToken();
 };
