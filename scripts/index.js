@@ -229,6 +229,7 @@ const main = function() {
 
   dialog.on('hide', function (el, ev) {
     state.submitCodeModal = false;
+    $directions.find('#open-submit-code').focus();
   });
 
   $directions.on('submit', '#password-form', Listeners.onSubmitPasswordForm);
