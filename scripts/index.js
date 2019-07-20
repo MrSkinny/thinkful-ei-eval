@@ -1,4 +1,4 @@
-/* global mocha */
+/* global mocha A11yDialog */
 
 const currentUrl = new URL(window.location.href);
 const SERVER_PROD_URL = 'https://thinkful-ei-eval-server.herokuapp.com';
@@ -28,8 +28,8 @@ const Templates = {
         <li>Talk through your thought process so your evaluator can understand how you're solving the problem.</li>
       </ul>
 
-      <button id="reset-password">Reset Passphrase</button>
-      <button id="open-submit-code">Submit Code</button>
+      <button id="reset-password" class="btn">Reset Passphrase</button>
+      <button id="open-submit-code" class="btn btn-primary">Submit Code</button>
 
       ${state.tests.map(test => `<hr />${test.instr}`).join('')}
     `;  
@@ -50,27 +50,10 @@ const Templates = {
     `;
   },
 
-  submitCodeModal() {
+  submissionResponse() {
     return `
-      <div class="modal-content">
-        <h3>Submit Your Evaluation</h3>
-        <form id="submit-code-form">
-          <div class="input-group">
-            <label for="submit-code-email">Your Email:</label>
-            <input type="email" name="email" id="submit-code-email" required />
-          </div>
-          <div class="input-group">
-            <label for="submit-code-script">Code from student.js:</label>
-            <textarea name="code" id="submit-code-script" cols="50" rows="10" required></textarea>
-          </div>
-          <div class="button-group">
-            <button class="submit" type="submit">Submit</button>
-            <button class="cancel" type="button">Cancel</button>
-          </div>
-          <div class="submit-response ${state.submitResponse.status !== 201 ? 'error' : ''}">
-            ${state.submitResponse.status === 201 ? 'Submission successful. Thank you!' : state.submitResponse.message || '' }
-          </div>
-        </form>
+      <div class="submit-response js-submit-response ${state.submitResponse.status !== 201 ? 'error' : ''}">
+        ${state.submitResponse.status === 201 ? 'Submission successful. Thank you!' : state.submitResponse.message || '' }
       </div>
     `;
   }
@@ -96,7 +79,7 @@ const render = function() {
   }
 
   if (state.submitCodeModal) {
-    return $('#modal').html(Templates.submitCodeModal());
+    return $('.js-submit-response').replaceWith(Templates.submissionResponse());
   }
 
   if (state.validToken) {
@@ -233,11 +216,28 @@ const detectToken = function() {
 };
 
 const main = function() {
-  $('.directions').on('submit', '#password-form', e => Listeners.onSubmitPasswordForm(e));
-  $('.directions').on('click', '#reset-password', Listeners.onClickResetPassword);
-  $('.directions').on('click', '#open-submit-code', Listeners.onClickOpenModal);
-  $('#modal').on('click', '.cancel', Listeners.onClickCancelModal);
-  $('#modal').on('submit', '#submit-code-form', e => Listeners.onSubmitTests(e));
+  const el = document.getElementById('modal');
+  const content = document.getElementById('main');
+  const dialog = new A11yDialog(el, main);
+
+  const $directions = $('.directions');
+  const $modal = $('#modal');
+
+  dialog.on('show', function (el, ev) {
+    state.submitCodeModal = true;
+  });
+
+  dialog.on('hide', function (el, ev) {
+    state.submitCodeModal = false;
+    $directions.find('#open-submit-code').focus();
+  });
+
+  $directions.on('submit', '#password-form', Listeners.onSubmitPasswordForm);
+  $directions.on('click', '#reset-password', Listeners.onClickResetPassword);
+  $directions.on('click', '#open-submit-code', dialog.show.bind(dialog));
+
+  $modal.on('click', '.cancel', dialog.hide.bind(dialog));
+  $modal.on('submit', '#submit-code-form', Listeners.onSubmitTests);
 
   detectToken();
 };
